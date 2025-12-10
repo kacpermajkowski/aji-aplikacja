@@ -1,0 +1,53 @@
+
+services:
+  postgres:
+    extends:
+      file: docker-compose-only-db.yml
+      service: postgres
+
+  backend:
+    user: "${UID}:${GID}"
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-dev
+    container_name: aji_backend
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/aji_db
+      PORT: 3000
+    volumes:
+      - ./backend:/app:z
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - aji-network
+
+  frontend:
+    user: "${UID}:${GID}"
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile-dev
+    container_name: aji_frontend
+    volumes:
+      - ./frontend:/app:z
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: http://backend:3000
+    ports:
+      - "80:5173"
+    depends_on:
+      - backend
+    networks:
+      - aji-network
+
+volumes:
+  aji_postgres_data:
+    driver: local
+
+networks:
+  aji-network:
+    driver: bridge
