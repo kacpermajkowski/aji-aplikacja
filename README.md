@@ -23,13 +23,7 @@ docker-compose --file "./docker-compose-prod.yml" up -d
 
 #### Wariant 2a - wszystko w kontenerach
 
-1. Zapewnij uprawnienia wymaganym folderom, przykład dla Linux
-```bash
-chmod -R 777 ./backend
-chmod -R 777 ./frontned
-```
-
-2. Uruchom zestaw kontenerów
+1. Uruchom zestaw kontenerów
 ```bash
 docker-compose --file "./docker-compose-dev.yml" up -d
 ```
