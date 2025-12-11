@@ -7,6 +7,12 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
+    "baseUrl": "./src",
+    "paths": {
+      "models/": ["backend/src/models/"],
+      "endpoints/": ["backend/src/endpoints/"]
+    },
+    
     "module": "commonjs",
     "target": "es2016",
     "types": ["node", "express"],

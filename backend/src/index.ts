@@ -3,6 +3,7 @@ import express from "express";
 import { AppDataSource } from "./data-source";
 import { OrderStatus } from "./model/OrderStatus";
 import { endpoints } from "./endpoints";
+import 'dotenv/config';
 
 const app = express()
 const port = 3000
@@ -22,10 +23,10 @@ async function initializeOrderStatuses() {
   const repo = AppDataSource.getRepository(OrderStatus);
 
   const statuses = [
-    new OrderStatus("NIEZATWIERDZONE"),
-    new OrderStatus("ZATWIERDZONE"),
-    new OrderStatus("ANULOWANE"),
-    new OrderStatus("ZREALIZOWANE")
+    new OrderStatus("NIEZATWIERDZONE", 1),
+    new OrderStatus("ANULOWANE", 2),
+    new OrderStatus("ZATWIERDZONE", 3),
+    new OrderStatus("ZREALIZOWANE", 4)
   ]
 
   await statuses.forEach(async status => {
