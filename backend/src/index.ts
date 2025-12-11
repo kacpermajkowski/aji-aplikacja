@@ -2,6 +2,7 @@ import "reflect-metadata";
 import express from "express";
 import { AppDataSource } from "./data-source";
 import { OrderStatus } from "./model/OrderStatus";
+import { endpoints } from "./endpoints";
 
 const app = express()
 const port = 3000
@@ -10,8 +11,9 @@ const port = 3000
 // and "synchronize" database schema, call "initialize()" method of a newly created database
 // once in your application bootstrap
 AppDataSource.initialize()
-  .then(endpoints)
   .then(initializeOrderStatuses)
+  .then(() => endpoints(app))
+  .then(startListening)
   .catch((error) => {
     console.log(error)
   });
@@ -33,13 +35,9 @@ async function initializeOrderStatuses() {
   })
 }
 
-function endpoints(){
-  app.get('/products', (req, res) => {
-    res.send('Hello World!3333')
-    
-  })
-
+function startListening(){
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })
 }
+
