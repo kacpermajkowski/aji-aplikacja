@@ -16,6 +16,9 @@ export class Product {
     @Column("real")
     unit_price!: number
 
+    @Column("real")
+    weight!: number
+
     @ManyToOne(() => Category, (category) => category.products, { nullable: false })
     category!: Category
 
