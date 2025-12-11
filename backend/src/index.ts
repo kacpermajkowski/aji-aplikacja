@@ -11,12 +11,12 @@ const port = 3000
 // once in your application bootstrap
 AppDataSource.initialize()
   .then(endpoints)
-  .then(seedDatabase)
+  .then(initializeOrderStatuses)
   .catch((error) => {
     console.log(error)
   });
 
-async function seedDatabase() {
+async function initializeOrderStatuses() {
   const repo = AppDataSource.getRepository(OrderStatus);
 
   const statuses = [
@@ -26,7 +26,11 @@ async function seedDatabase() {
     new OrderStatus("ZREALIZOWANE")
   ]
 
-  await statuses.forEach(status => repo.save(status))
+  await statuses.forEach(async status => {
+    const existing = await repo.findOne({ where: { name: status.name } });
+    if(!existing)
+      repo.save(status);
+  })
 }
 
 function endpoints(){
