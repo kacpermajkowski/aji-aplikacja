@@ -9,8 +9,9 @@
     // See also https://aka.ms/tsconfig/module
     "baseUrl": "./src",
     "paths": {
-      "models/": ["backend/src/models/"],
-      "endpoints/": ["backend/src/endpoints/"]
+      // Map import prefixes to folders relative to baseUrl
+      "model/*": ["model/*"],
+      "endpoints/*": ["endpoints/*"],
     },
     
     "module": "commonjs",

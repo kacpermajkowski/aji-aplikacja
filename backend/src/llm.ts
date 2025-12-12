@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-export async function generateSEODescription(product: {
+export default async function generateSEODescription(product: {
     name: string;
     description: string;
     unit_price: number;

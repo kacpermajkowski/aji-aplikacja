@@ -10,15 +10,17 @@ const categoriesRepo = AppDataSource.getRepository(Category);
 export default function addNewProduct(app: Express){
     app.post('/products', async (req, res) => {
         try {
+            if(!req.body){
+                return res.status(StatusCodes.BAD_REQUEST).send({
+                    message: 'Missing request body'
+                });
+            }
+
             const { name, description, unit_price, weight, categoryId } = req.body;
 
-            // unit_price can be 0 at this validation stage
-            // so for now we check if it's undefined
-            // because negating 0 would yield 'true' which would
-            // trigger the error message incorrectly
             if (!name || !description || unit_price === undefined || weight === undefined || !categoryId) {
                 return res.status(StatusCodes.BAD_REQUEST).send({
-                    message: 'Missing required fields: name, description, weight, unit_price, categoryId'
+                    message: 'Missing one or more of required body parameters: name, description, weight, unit_price, categoryId'
                 });
             }
 
@@ -75,7 +77,7 @@ export default function addNewProduct(app: Express){
         } catch (err) {
             console.error(err);
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-                error: 'Failed to create product'
+                error: 'Failed to create product: '
             });
         }
     })

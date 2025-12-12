@@ -11,7 +11,13 @@ const ordersRepo = AppDataSource.getRepository(Order);
 export default function getOrdersByStatus(app: Express){
     app.get('/orders/status/:id', async (req, res) => {
         const orderList = await ordersRepo.find({
-            where: { orderStatus: { id: parseInt(req.params.id) } }
+            where: { orderStatus: { id: parseInt(req.params.id) } },
+            relations: {
+                orderProducts: {
+                    product: true,
+                },
+                orderStatus: true,
+            },
         })
         res.send({ orders: orderList });
     })

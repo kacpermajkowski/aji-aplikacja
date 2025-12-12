@@ -8,10 +8,16 @@ const ordersRepo = AppDataSource.getRepository(Order);
 
 export default function getAllOrders(app: Express){
     app.get('/orders', async (req, res) => {
-        const allOrders = await ordersRepo.find();
+        const allOrders = await ordersRepo.find({
+            relations: {
+                orderProducts: {
+                    product: true,
+                },
+                orderStatus: true,
+            },
+        });
         res.send({
             orders: allOrders,
-            relations: ['orderProducts', 'orderProducts.product', 'orderStatus']
         })
     })
 }

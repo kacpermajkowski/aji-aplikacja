@@ -1,9 +1,9 @@
-import { generateSEODescription } from "../../../llm.js";
-import { AppDataSource } from "../../data-source.js";
-import { Product } from "../../model/Product.js";
-import { Category } from "../../model/Category.js";
+
+import { AppDataSource } from "data-source";
+import { Product } from "model/Product";
 import { Express } from "express";
 import { StatusCodes } from "http-status-codes";
+import generateSEODescription from "llm";
 
 export default function getSeoDescription(app: Express) {
     const productsRepo = AppDataSource.getRepository(Product);

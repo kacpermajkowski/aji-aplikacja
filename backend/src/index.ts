@@ -4,6 +4,7 @@ import { AppDataSource } from "./data-source";
 import { OrderStatus } from "./model/OrderStatus";
 import { endpoints } from "./endpoints";
 import 'dotenv/config';
+import { Category } from "model/Category";
 
 const app = express()
 const port = 3000
@@ -12,15 +13,16 @@ const port = 3000
 // and "synchronize" database schema, call "initialize()" method of a newly created database
 // once in your application bootstrap
 AppDataSource.initialize()
-  .then(initializeOrderStatuses)
+  .then(initializeFixedDbData)
+  .then(() => app.use(express.json()))
   .then(() => endpoints(app))
   .then(startListening)
   .catch((error) => {
     console.log(error)
   });
 
-async function initializeOrderStatuses() {
-  const repo = AppDataSource.getRepository(OrderStatus);
+async function initializeFixedDbData() {
+  const statusRepo = AppDataSource.getRepository(OrderStatus);
 
   const statuses = [
     new OrderStatus("NIEZATWIERDZONE", 1),
@@ -30,9 +32,24 @@ async function initializeOrderStatuses() {
   ]
 
   await statuses.forEach(async status => {
-    const existing = await repo.findOne({ where: { name: status.name } });
+    const existing = await statusRepo.findOne({ where: { name: status.name } });
     if(!existing)
-      repo.save(status);
+      statusRepo.save(status);
+  })
+
+  const categoryRepo = AppDataSource.getRepository(Category);
+
+  const categories = [
+    new Category('higieniczne', 1),
+    new Category('dla zwierząt', 2),
+    new Category('spożywcze', 3),
+    new Category('elektronika', 4),
+  ]
+
+  await categories.forEach(async category => {
+    const existing = await categoryRepo.findOne({ where: { name: category.name } });
+    if(!existing)
+      categoryRepo.save(category);
   })
 }
 
