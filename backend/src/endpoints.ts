@@ -14,9 +14,15 @@ import updateOrderStatus from "endpoints/orders/updateOrderStatus";
 import getSpecificOrder from "endpoints/orders/getSpecificOrder";
 
 import getAllStatuses from "endpoints/status/getAllStatuses";
+import addOpinion from "endpoints/orders/opinions/addOpinion";
+import { initEndpoints } from "endpoints/init/init-endpoint";
+import { AuthEndpoints } from "endpoints/auth/auth-endpoints";
+
 
 
 export function endpoints(app: Express) {
+    // Init
+
     // Product
     getAllProducts(app);
     getSpecificProduct(app);
@@ -33,6 +39,15 @@ export function endpoints(app: Express) {
     updateOrderStatus(app);
     getSpecificOrder(app);
 
+    // Opinion
+    addOpinion(app);
+
     // Order Statuses
     getAllStatuses(app);
+
+    // Init
+    initEndpoints(app);
+
+    // Authentication
+    AuthEndpoints(app);
 }

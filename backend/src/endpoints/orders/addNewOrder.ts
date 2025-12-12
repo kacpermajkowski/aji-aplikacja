@@ -15,11 +15,17 @@ export default function addNewOrder(app: Express){
     
     app.post('/orders', async (req, res) => {
         try {
+            if(!req.body){
+                return res.status(StatusCodes.BAD_REQUEST).send({
+                    message: 'Missing request body'
+                });
+            }
+
             const { username, email, phone_number, statusId, items } = req.body;
 
-            if (!username || !email || !phone_number || !statusId || !Array.isArray(items) || items.length === 0) {
+            if (!username || !email || !phone_number || !Array.isArray(items) || items.length === 0) {
                 return res.status(StatusCodes.BAD_REQUEST).send({
-                    message: 'Missing required fields: username, email, phone_number, statusId, items[]'
+                    message: 'Missing required fields: username, email, phone_number, items[]'
                 });
             }
 
@@ -42,18 +48,19 @@ export default function addNewOrder(app: Express){
                     message: 'Invalid email format'
                 });
             }
-
-            const phoneRegex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
+            // International phone number regex from https://stackoverflow.com/questions/2113908/what-regular-expression-will-match-valid-international-phone-numbers
+            const phoneRegex = /^\+((?:9[679]|8[035789]|6[789]|5[90]|42|3[578]|2[1-689])|9[0-58]|8[1246]|6[0-6]|5[1-8]|4[013-9]|3[0-469]|2[70]|7|1)(?:\W*\d){0,13}\d$/;
             if (!phoneRegex.test(phone_number)) {
                 return res.status(StatusCodes.BAD_REQUEST).send({
                     message: 'Invalid phone number format'
                 });
             }
 
-            const parsedStatusId = Number(statusId);
-            if (Number.isNaN(parsedStatusId)) {
+            const parsedStatusId = statusId === undefined || statusId === null || statusId === '' ? 1 : Number(statusId);
+
+            if (!Number.isInteger(parsedStatusId) || parsedStatusId <= 0) {
                 return res.status(StatusCodes.BAD_REQUEST).send({
-                    message: 'statusId must be a number'
+                    message: 'statusId must be a positive integer'
                 });
             }
 
@@ -85,10 +92,24 @@ export default function addNewOrder(app: Express){
                         message: `Product with id = ${productId} not found`
                     });
                 }
+
+                let unit_price_to_save: number;
+                if (item.unit_price !== undefined) {
+                    const parsedUnitPrice = Number(item.unit_price);
+                    if (isNaN(parsedUnitPrice) || parsedUnitPrice < 0) {
+                        return res.status(StatusCodes.BAD_REQUEST).send({
+                            message: 'unit_price must be a non-negative number'
+                        });
+                    }
+                    unit_price_to_save = parsedUnitPrice;
+                } else {
+                    unit_price_to_save = product.unit_price;
+                }
                 const orderProduct = new OrderProduct();
                 orderProduct.product = product;
                 orderProduct.amount = amount;
-                orderProduct.unit_price = product.unit_price;
+                orderProduct.unit_price = unit_price_to_save;
+
                 orderItems.push(orderProduct);
             }
 
@@ -105,9 +126,16 @@ export default function addNewOrder(app: Express){
             }
             await orderProductsRepo.save(orderItems);
 
+            const fullOrder = await ordersRepo.findOne({
+                where: { id: savedOrder.id },
+                relations: {
+                    orderProducts: { product: true },
+                    orderStatus: true,
+                },
+            });
+
             return res.status(StatusCodes.CREATED).send({
-                order: savedOrder,
-                items: orderItems
+                order: fullOrder,
             });
         } catch (err) {
             console.error(err);

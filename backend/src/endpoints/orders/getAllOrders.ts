@@ -14,6 +14,7 @@ export default function getAllOrders(app: Express){
                     product: true,
                 },
                 orderStatus: true,
+                opinion: true
             },
         });
         res.send({

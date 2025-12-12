@@ -16,12 +16,19 @@ export default function updateSpecificProduct(app: Express){
                     message: 'Invalid product id'
                 });
             }
+
             const product = await productsRepo.findOne({
                 where: { id: productId }
             });
             if (!product) {
                 return res.status(StatusCodes.NOT_FOUND).send({
                     message: `Product with id = ${productId} not found`
+                });
+            }
+
+            if(!req.body){
+                return res.status(StatusCodes.BAD_REQUEST).send({
+                    message: 'Missing request body'
                 });
             }
 
@@ -64,7 +71,7 @@ export default function updateSpecificProduct(app: Express){
                 const parsedCategoryId = Number(categoryId);
                 if (Number.isNaN(parsedCategoryId) || !Number.isInteger(parsedCategoryId) || parsedCategoryId <= 0) {
                     return res.status(StatusCodes.BAD_REQUEST).send({
-                        message: 'categoryId must be a positive integer'
+                        message: 'categoryId must be an integer greater than 0'
                     });
                 }
                 const category = await categoriesRepo.findOne({

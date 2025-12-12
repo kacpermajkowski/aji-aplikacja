@@ -1,7 +1,8 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import type { Product } from "./Product"
 import { OrderProduct } from "./OrderProduct"
 import { OrderStatus } from "./OrderStatus"
+import { Opinion } from "./Opinion"
 
 @Entity()
 export class Order {
@@ -26,4 +27,6 @@ export class Order {
     @ManyToOne(() => OrderStatus, (orderStatus) => orderStatus.orders, { nullable: false })
     orderStatus!: OrderStatus
 
+    @OneToOne(() => Opinion, (opinion) => opinion.order)
+    opinion?: Opinion
 }

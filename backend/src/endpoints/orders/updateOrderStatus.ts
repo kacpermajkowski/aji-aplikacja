@@ -58,7 +58,7 @@ export default function updateOrderStatus(app: Express){
 
             const allowedStatusTransitions: Record<number, number[]> ={
                 1: [2,3],
-                3: [1,4],
+                3: [2,4],
                 2: [],
                 4: [],
             };

@@ -5,6 +5,8 @@ import { Order } from "./model/Order"
 import { Category } from "./model/Category"
 import { OrderProduct } from "./model/OrderProduct"
 import { OrderStatus } from "./model/OrderStatus"
+import { Opinion } from "model/Opinion"
+import { User } from "model/User"
 
 const host: string = process.env.DATABASE_HOST ?? "localhost"
 
@@ -15,7 +17,7 @@ export const AppDataSource = new DataSource({
     username: "postgres",
     password: "postgres",
     database: "aji_db",
-    entities: [Product, Order, Category, OrderProduct, OrderStatus],
+    entities: [Product, Order, Category, OrderProduct, OrderStatus, User, Opinion],
     synchronize: true,
     logging: false,
 })

@@ -37,9 +37,7 @@ export default function getSeoDescription(app: Express) {
                 category: product.category.name
             });
 
-            return res.send({
-                seoDescription: [seoHtml]
-            });
+            return res.send(seoHtml);
         }
         catch (error) {
             console.error('Error generating SEO description:', error);
