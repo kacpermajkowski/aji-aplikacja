@@ -25,7 +25,7 @@ export function initEndpoints(app: Express) {
           .status(StatusCodes.BAD_REQUEST)
           .send({ message: "No file uploaded" });
       }
-      let productsData = [];
+      let productsData;
       try {
         productsData = JSON.parse(req.file.buffer.toString());
       } catch (e) {
@@ -33,18 +33,19 @@ export function initEndpoints(app: Express) {
           .status(StatusCodes.BAD_REQUEST)
           .send({ message: "Invalid products data" });
       }
-      if (!Array.isArray(productsData) || productsData.length === 0) {
+      let productsArray = productsData.products;
+      if (!Array.isArray(productsArray) || productsArray.length === 0) {
         return res
           .status(StatusCodes.BAD_REQUEST)
           .send({ message: "Products data must be a non-empty array" });
       }
-      for (const item of productsData) {
+      for (const item of productsArray) {
         const { name, description, unit_price, weight, category } = item;
         if (!name || !description || !unit_price || !weight || !category)
           return res
             .status(StatusCodes.BAD_REQUEST)
             .send({ message: "Invalid product data in JSON file" });
-        const cat = await categoriesRepo.findOne({ where: { name: category } });
+        const cat = await categoriesRepo.findOne({ where: { id: parseInt(category) } });
         if (!cat) {
           return res
             .status(StatusCodes.NOT_FOUND)
