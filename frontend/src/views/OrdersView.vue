@@ -80,7 +80,7 @@ function canChangeStatus(order: Order): boolean {
 }
 
 function canAddOpinion(order: Order): boolean {
-  return order.orderStatus.id == 2 && !order.opinion;
+  return [3, 4].includes(order.orderStatus.id) && !order.opinion;
 }
 
 function openOpinionModal(orderId: number) {
