@@ -18,8 +18,10 @@ export class Opinion {
     @Column()
     content!: string
 
+    @Column()
+    opinion_date!: Date
+
     @OneToOne(() => Order)
     @JoinColumn()
     order!: Order
-    
 }

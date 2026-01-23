@@ -18,7 +18,8 @@ export default function updateSpecificProduct(app: Express){
             }
 
             const product = await productsRepo.findOne({
-                where: { id: productId }
+                where: { id: productId },
+                relations: { category: true }
             });
             if (!product) {
                 return res.status(StatusCodes.NOT_FOUND).send({
@@ -85,7 +86,11 @@ export default function updateSpecificProduct(app: Express){
                 product.category = category;
             }
             const saved = await productsRepo.save(product);
-            return res.status(StatusCodes.OK).send({ product: saved });
+            const savedWithRelations = await productsRepo.findOne({
+                where: { id: saved.id },
+                relations: { category: true }
+            });
+            return res.status(StatusCodes.OK).send({ product: savedWithRelations });
         } catch (err) {
             console.error(err);
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({

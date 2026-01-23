@@ -57,16 +57,20 @@ export default function updateOrderStatus(app: Express){
             }
 
             const allowedStatusTransitions: Record<number, number[]> ={
-                1: [2,3],
-                3: [2,4],
+                1: [4,3],
+                4: [3,2],
+                3: [],
                 2: [],
-                4: [],
             };
 
             if (!allowedStatusTransitions[order.orderStatus.id]?.includes(newStatus.id)) {
                 return res.status(StatusCodes.BAD_REQUEST).send({
                     message: `Cannot change status from ${order.orderStatus.name} to ${newStatus.name}`
                 });
+            }
+
+            if(newStatus.id == 4){
+                order.confirmation_date = new Date();
             }
 
             order.orderStatus = newStatus;

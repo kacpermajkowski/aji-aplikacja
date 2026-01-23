@@ -4,7 +4,6 @@ import { AppDataSource } from "data-source";
 import { Product } from "model/Product";
 import { Category } from "model/Category";
 import multer from "multer";
-import { authRequired, roleRequired } from "auth";
 
 const upload = multer({ storage: multer.memoryStorage() });
 export function initEndpoints(app: Express) {
@@ -12,7 +11,7 @@ export function initEndpoints(app: Express) {
   const productsRepo = AppDataSource.getRepository(Product);
   const categoriesRepo = AppDataSource.getRepository(Category);
 
-  app.post("/init",authRequired, roleRequired("PRACOWNIK"), upload.single("file"), async (req, res) => {
+  app.post("/init", upload.single("file"), async (req, res) => {
     try {
       const count = await productsRepo.count();
       if (count > 0) {

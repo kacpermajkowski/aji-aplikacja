@@ -3,7 +3,6 @@ import { AppDataSource } from "data-source";
 import { StatusCodes } from "http-status-codes";
 import { Order } from "model/Order";
 import { Opinion } from "model/Opinion";
-import { authRequired, AuthTokenPayload } from "auth";
 
 
 export default function addOpinion(app: Express){
@@ -11,7 +10,7 @@ export default function addOpinion(app: Express){
     const orderRepo = AppDataSource.getRepository(Order);
     const opinionRepo = AppDataSource.getRepository(Opinion);
     
-    app.post('/orders/:id/opinions', authRequired, async (req, res) => {
+    app.post('/orders/:id/opinions', async (req, res) => {
         try {
             if(!req.body){
                 return res.status(StatusCodes.BAD_REQUEST).send({
@@ -25,7 +24,7 @@ export default function addOpinion(app: Express){
                     message: 'Invalid order ID. It has to be an integer greater than 0'
                 });
             }
-            const user = (req as any).user as AuthTokenPayload;
+            
             const order = await orderRepo.findOne({
                 where: { id: orderId }, 
                 relations: ['orderStatus']
@@ -34,12 +33,6 @@ export default function addOpinion(app: Express){
             if (!order) {
                 return res.status(StatusCodes.NOT_FOUND).send({
                     message: `Order with ID ${orderId} not found`
-                });
-            }
-
-            if (order.username !== user.login) {
-                return res.status(StatusCodes.FORBIDDEN).send({
-                    message: `You can add opinion only to your own orders`
                 });
             }
             
@@ -59,11 +52,10 @@ export default function addOpinion(app: Express){
                 });
             }
 
-            const { rating, content } = req.body;
-
-            if (!content || rating === undefined) {
+            const { rating, content, opinion_date } = req.body;
+            if (!content || rating === undefined || opinion_date === undefined) {
                 return res.status(StatusCodes.BAD_REQUEST).send({
-                    message: 'Missing required fields: content, rating'
+                    message: 'Missing required fields: content, rating, opinion_date'
                 });
             }
 
@@ -86,12 +78,29 @@ export default function addOpinion(app: Express){
                     message: 'rating must be an integer between 1 and 5'
                 });
             }
-           
+
+
+            const parsedOpinionDate = new Date(opinion_date);
+            if (isNaN(parsedOpinionDate.getTime())) {
+                return res.status(StatusCodes.BAD_REQUEST).send({
+                    message: 'opinion_date must be a valid date string or timestamp'
+                });
+            }
+
+            const now = new Date();
+            const weekInMs = 7 * 24 * 60 * 60 * 1000;
+            if (Math.abs(parsedOpinionDate.getTime() - now.getTime()) > weekInMs) {
+                return res.status(StatusCodes.BAD_REQUEST).send({
+                    message: 'opinion_date must be within one week of the current date'
+                });
+            }
+
             const opinion = new Opinion();
             opinion.rating = parsedRating;
             opinion.content = content;
             opinion.order = order;
-            
+            opinion.opinion_date = parsedOpinionDate;
+
             const savedOpinion = await opinionRepo.save(opinion);
 
             return res.status(StatusCodes.CREATED).send({

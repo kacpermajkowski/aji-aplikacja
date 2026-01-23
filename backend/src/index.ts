@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import express from "express";
+import cors from "cors";
 import { AppDataSource } from "./data-source";
 import { OrderStatus } from "./model/OrderStatus";
 import { endpoints } from "./endpoints";
@@ -8,6 +9,9 @@ import { Category } from "model/Category";
 
 const app = express()
 const port = 3000
+
+// Enable CORS for all origins
+app.use(cors());
 
 // to initialize the initial connection with the database, register all entities
 // and "synchronize" database schema, call "initialize()" method of a newly created database
@@ -26,9 +30,9 @@ async function initializeFixedDbData() {
 
   const statuses = [
     new OrderStatus("NIEZATWIERDZONE", 1),
-    new OrderStatus("ANULOWANE", 2),
-    new OrderStatus("ZATWIERDZONE", 3),
-    new OrderStatus("ZREALIZOWANE", 4)
+    new OrderStatus("ZREALIZOWANE", 2),
+    new OrderStatus("ANULOWANE", 3),
+    new OrderStatus("ZATWIERDZONE", 4)
   ]
 
   await statuses.forEach(async status => {

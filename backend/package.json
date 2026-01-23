@@ -2,6 +2,7 @@
   "name": "aji-backend",
   "main": "index.js",
   "dependencies": {
+    "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "axios": "^1.13.2",

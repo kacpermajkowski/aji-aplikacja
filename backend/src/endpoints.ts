@@ -17,6 +17,7 @@ import getAllStatuses from "endpoints/status/getAllStatuses";
 import addOpinion from "endpoints/orders/opinions/addOpinion";
 import { initEndpoints } from "endpoints/init/init-endpoint";
 import { AuthEndpoints } from "endpoints/auth/auth-endpoints";
+import getOrdersByStatus from "endpoints/orders/getOrdersByStatus";
 
 
 
@@ -38,6 +39,7 @@ export function endpoints(app: Express) {
     addNewOrder(app);
     updateOrderStatus(app);
     getSpecificOrder(app);
+    getOrdersByStatus(app);
 
     // Opinion
     addOpinion(app);
